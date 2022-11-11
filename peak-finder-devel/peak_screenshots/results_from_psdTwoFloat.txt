@@ -1,0 +1,155 @@
+reading values from the .bin file...
+
+
+mean = -175633 / 4096 = -42.8792
+threshold = mean + 8dB = -34.8792
+
+size of peak_mag vector = 0
+
+        magnitude             frequency
+
+
+combining the derivative and threshold approach...
+data[1961-1] - data[1961] = -1.79395
+data[1961] - data[1961+1] = -0.757854
+data[1961-2] - data[1961] = -1.88435
+data[1961] - data[1961+2] = -0.834103
+data[1961-5] - data[1961] = -4.07926
+data[1961] - data[1961+5] = -6.95225
+
+
+nada nothing here
+
+data[1962-1] - data[1962] = -0.757854
+data[1962] - data[1962+1] = -0.0762482
+data[1962-2] - data[1962] = -2.5518
+data[1962] - data[1962+2] = -1.50734
+data[1962-5] - data[1962] = -2.77296
+data[1962] - data[1962+5] = -17.6605
+
+
+nada nothing here
+
+data[1963-1] - data[1963] = -0.0762482
+data[1963] - data[1963+1] = -1.4311
+data[1963-2] - data[1963] = -0.834103
+data[1963] - data[1963+2] = -3.6852
+data[1963-5] - data[1963] = -3.35764
+data[1963] - data[1963+5] = -7.07529
+
+
+nada nothing here
+
+data[1964-1] - data[1964] = -1.4311
+data[1964] - data[1964+1] = -2.2541
+data[1964-2] - data[1964] = -1.50734
+data[1964] - data[1964+2] = -4.68705
+data[1964-5] - data[1964] = -4.14955
+data[1964] - data[1964+5] = -2.33576
+
+
+nada nothing here
+
+data[1965-1] - data[1965] = -2.2541
+data[1965] - data[1965+1] = -2.43295
+data[1965-2] - data[1965] = -3.6852
+data[1965] - data[1965+2] = -13.8991
+data[1965-5] - data[1965] = -6.31325
+data[1965] - data[1965+5] = 1.98521
+
+
+nada nothing here
+
+data[1966-1] - data[1966] = -2.43295
+data[1966] - data[1966+1] = -11.4661
+data[1966-2] - data[1966] = -4.68705
+data[1966] - data[1966+2] = -0.957146
+data[1966-5] - data[1966] = -6.95225
+data[1966] - data[1966+5] = 5.09055
+
+
+nada nothing here
+
+data[1967-1] - data[1967] = -11.4661
+data[1967] - data[1967+1] = 10.509
+data[1967-2] - data[1967] = -13.8991
+data[1967] - data[1967+2] = 13.8174
+data[1967-5] - data[1967] = -17.6605
+data[1967] - data[1967+5] = 17.9413
+
+
+nada nothing here
+
+data[1968-1] - data[1968] = 10.509
+data[1968] - data[1968+1] = 3.30844
+data[1968-2] - data[1968] = -0.957146
+data[1968] - data[1968+2] = 5.3753
+data[1968-5] - data[1968] = -7.07529
+data[1968] - data[1968+5] = 7.90995
+
+
+nada nothing here
+
+data[1969-1] - data[1969] = 3.30844
+data[1969] - data[1969+1] = 2.06686
+data[1969-2] - data[1969] = 13.8174
+data[1969] - data[1969+2] = 2.73926
+data[1969-5] - data[1969] = -2.33576
+data[1969] - data[1969+5] = 5.23227
+
+
+nada nothing here
+
+data[1970-1] - data[1970] = 2.06686
+data[1970] - data[1970+1] = 0.672396
+data[1970-2] - data[1970] = 5.3753
+data[1970] - data[1970+2] = 2.057
+data[1970-5] - data[1970] = 1.98521
+data[1970] - data[1970+5] = 3.30707
+
+
+nada nothing here
+
+data[1971-1] - data[1971] = 0.672396
+data[1971] - data[1971+1] = 1.3846
+data[1971-2] - data[1971] = 2.73926
+data[1971] - data[1971+2] = 1.86225
+data[1971-5] - data[1971] = 5.09055
+data[1971] - data[1971+5] = 4.23879
+
+
+nada nothing here
+
+data[1972-1] - data[1972] = 1.3846
+data[1972] - data[1972+1] = 0.47765
+data[1972-2] - data[1972] = 2.057
+data[1972] - data[1972+2] = 1.10841
+data[1972-5] - data[1972] = 17.9413
+data[1972] - data[1972+5] = 2.56516
+
+
+nada nothing here
+
+data[1973-1] - data[1973] = 0.47765
+data[1973] - data[1973+1] = 0.630756
+data[1973-2] - data[1973] = 1.86225
+data[1973] - data[1973+2] = 0.772419
+data[1973-5] - data[1973] = 7.90995
+data[1973] - data[1973+5] = 2.69065
+
+
+nada nothing here
+
+data[1974-1] - data[1974] = 0.630756
+data[1974] - data[1974+1] = 0.141663
+data[1974-2] - data[1974] = 1.10841
+data[1974] - data[1974+2] = 1.74578
+data[1974-5] - data[1974] = 5.23227
+data[1974] - data[1974+5] = 1.67706
+
+
+nada nothing here
+
+data[1967] = -15.2034   freq[1967] = -994732
+
+program finished
