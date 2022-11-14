@@ -98,67 +98,32 @@ int main() {
    //    - each subset is determined as following
    //       - find the frequency difference between the current and the next data point (neighbors)
    //       - if the frequency difference is less than -122040
-   float greatest = data[abv_threshold_index[0]];
-   int greatest_index = 0, current_data_index;
-   // std::cout << "\n\tmagnitude\tfrequency\t\tdata index\tfreq dif\tmag dif\n" << std::endl; // checking the peak vectors
+   float greatest = data[abv_threshold_index[0]], bandwidth = 0;
+   int greatest_index = 0, current_data_index, start_index = abv_threshold_index[0], end_index;
+
    for (int ll=0; ll<abv_threshold_index.size()-1; ll++) { 
       current_data_index = abv_threshold_index[ll];
       dif_index = abv_threshold_index[ll+1] - abv_threshold_index[ll];
 
-      // std::cout << ll << ". dif_index = " << dif_index << "\t mag = " << data[current_data_index] << std::endl;
-
-      if ((data[current_data_index] > greatest) && ((data[current_data_index] - threshold) > 3)) { // finding the greatest magnitude in each subset, this kind of works
-         greatest = data[current_data_index];
+      if ((data[current_data_index] > greatest) ) { // finding the greatest magnitude in each subset, this kind of works
+         greatest = data[current_data_index]; //&& ((data[current_data_index] - threshold) > 3
          greatest_index = current_data_index;
       }
 
       if (dif_index > 10) {  // if the current data point is more than 10 points away from the next point in the main dataset, then you're at the end of the peak subset
+         std::cout << "\ndata point " << greatest_index << " pushed to peak list, mag = " << data[greatest_index] << "\n" << std::endl;
+         peak_index.push_back(greatest_index);
+         greatest = data[abv_threshold_index[ll+1]];
+         greatest_index = abv_threshold_index[ll+1];
 
-         // slight error here there on psdThreeFloat.bin
-         // should I check if the same point is already in the vector?
-
-         // if (freq[greatest_index] == peak_freq.back()) std::cout << "the same freq/mag" << std::endl;
-
-         if ((greatest - threshold) < 3) { // if this is point is just way too low then don't even bother
-            std::cout << "greatest - threshold = " << greatest << " - " 
-                      << threshold << " = " << greatest - threshold << std::endl;
-            continue;
-         }
-
-         std::cout << "peak detected at index " << greatest_index << std::endl;
-         std::cout << "greatest - threshold = " << greatest << " - " 
-                   << threshold << " = " << greatest - threshold << std::endl;
-         std::cout << "(greatest - threshold) > 3 : " << ((greatest - threshold) > 3) << std::endl;
-         if (peak_index.empty() == 1 && (greatest - threshold) > 3) {
-            std::cout << "\tfirst element: point " << greatest_index << std::endl;
-            peak_index.push_back(greatest_index);
-            greatest = data[current_data_index+1];
-            greatest_index = abv_threshold_index[ll+1];
-            continue;
-         }   
-         
-         if (greatest_index == peak_index.back()) {
-            std::cout << "\tthe same freq/mag" << std::endl;
-            greatest = data[abv_threshold_index[ll+1]];
-            greatest_index = abv_threshold_index[ll+1];
-            continue;
-         }
-
-         // peak_index.push_back(greatest_index);
-         // greatest = data[current_data_index+1];
-         // greatest_index = abv_threshold_index[ll+1];
-
-         std::cout << "end of if statement" << std::endl;
+         end_index = current_data_index;
+         bandwidth = end_index - start_index;
+         std::cout << "bandwidth = end_index - start_index = " << end_index << " - " << start_index <<  " = " << bandwidth << std::endl;
+         start_index = abv_threshold_index[ll+1];
       }
-   
 
-      // // check immediate neighbors: 1 point away - if there's a sharp incline and decline at the current point, push that point to the peak vector
-      // if ( ((data[current_data_index] - data[current_data_index-1]) >= 3) && ((data[current_data_index+1] - data[current_data_index]) <= -3) ) {
-      //    std::cout << "\tsharp peak detected at " << current_data_index << " 1 neighboring point" << std::endl;
-      //    // continue;
-      // }
 
-      // std::cout << "end of for loop" << std::endl;
+      
 
    }
    peak_index.push_back(greatest_index);
@@ -298,3 +263,59 @@ int main() {
 
       
 //    } 
+
+
+/ // std::cout << ll << ". dif_index = " << dif_index << "\t mag = " << data[current_data_index] << std::endl;
+
+      // if ((data[current_data_index] > greatest) && ((data[current_data_index] - threshold) > 3)) { // finding the greatest magnitude in each subset, this kind of works
+      //    greatest = data[current_data_index];
+      //    greatest_index = current_data_index;
+      // }
+
+      // if (dif_index > 10) {  // if the current data point is more than 10 points away from the next point in the main dataset, then you're at the end of the peak subset
+
+      //    // slight error here there on psdThreeFloat.bin
+      //    // should I check if the same point is already in the vector?
+
+      //    // if (freq[greatest_index] == peak_freq.back()) std::cout << "the same freq/mag" << std::endl;
+
+      //    if ((greatest - threshold) < 3) { // if this is point is just way too low then don't even bother
+      //       std::cout << "greatest - threshold = " << greatest << " - " 
+      //                 << threshold << " = " << greatest - threshold << std::endl;
+      //       continue;
+      //    }
+
+      //    std::cout << "peak detected at index " << greatest_index << std::endl;
+      //    std::cout << "\tgreatest - threshold = " << greatest << " - " 
+      //              << threshold << " = " << greatest - threshold << std::endl;
+      //    std::cout << "\t(greatest - threshold) > 3 = " << ((greatest - threshold) > 3) << std::endl;
+      //    if (peak_index.empty() == 1 && (greatest - threshold) > 3) {
+      //       std::cout << "\tfirst element: point " << greatest_index << std::endl;
+      //       peak_index.push_back(greatest_index);
+      //       greatest = data[current_data_index+1];
+      //       greatest_index = abv_threshold_index[ll+1];
+      //       continue;
+      //    }   
+         
+      //    if (greatest_index == peak_index.back()) {
+      //       std::cout << "\tthe same freq/mag" << std::endl;
+      //       greatest = data[abv_threshold_index[ll+1]];
+      //       greatest_index = abv_threshold_index[ll+1];
+      //       continue;
+      //    }
+
+         // peak_index.push_back(greatest_index);
+         // greatest = data[current_data_index+1];
+         // greatest_index = abv_threshold_index[ll+1];
+
+         // std::cout << "end of if statement" << std::endl;
+      // }
+   
+
+      // // check immediate neighbors: 1 point away - if there's a sharp incline and decline at the current point, push that point to the peak vector
+      // if ( ((data[current_data_index] - data[current_data_index-1]) >= 3) && ((data[current_data_index+1] - data[current_data_index]) <= -3) ) {
+      //    std::cout << "\tsharp peak detected at " << current_data_index << " 1 neighboring point" << std::endl;
+      //    // continue;
+      // }
+
+      // std::cout << "end of for loop" << std::endl;

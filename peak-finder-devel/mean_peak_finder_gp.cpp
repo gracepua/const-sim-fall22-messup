@@ -44,11 +44,12 @@
 namespace plt = matplotlibcpp;
 
 int main() {
-   std::fstream readFile("simulation_data/psdThreeFloat.bin", std::ios::binary);
-   float var, var0, var1, dif_index, greatest, sum = 0, threshold;
-   std::vector<float> data, abv_threshold_mag, peak_mag; // i guess these need to be vectors
-   std::vector<double> freq, abv_threshold_freq, peak_freq, index_peak_freq;
+   std::fstream readFile("simulation_data/psdtOneFloat.bin", std::ios::binary);
+   float var, dif_index, sum = 0, threshold;
+   std::vector<float> data; 
+   std::vector<double> freq;
    std::vector<int> abv_threshold_index, peak_index;
+
 
    // 1. set the frequency array
    double ff = -25000000;
@@ -56,113 +57,88 @@ int main() {
       freq.push_back(ff);
       ff = ff + 12204;
    }
-   
 
-   readFile.open("simulation_data/psdThreeFloat.bin"); // reading from bin file: successful!
+
+   // 2. read the psd.bin file and store the psd values
+   readFile.open("simulation_data/psdOneFloat.bin"); // reading from bin file: successful!
    if(!readFile) {
       std::cout << "(r)Cannot open file!" << std::endl;
       return 1;
    }
-
-
-   // 2. read the psd.bin file and store the psd values
    std::cout << "\nreading values from the .bin file..." << std::endl;
-
-   readFile.read((char*)&var0, 4);
-   sum += var0;
-   data.push_back(var0);
-   // std::cout << var0 << "     \t";
    
-   int count = 1, n = 1;
+   int count = 0, n = 0;
    while (true) { // note: don't use .eof() function. use this loop format
-      readFile.read((char*)&var1, 4);
+      readFile.read((char*)&var, 4);
       if( readFile.eof() ) break;
 
-      data.push_back(var1);  // finding the sum of all the data magnitudes
-      sum += var1;
-      count++;
-
-      // std::cout << var1 << "     \t";
-      // n++;
-      // if (n == 10) {
-      //    std::cout << "\n";
-      //    n = 0;
-      // }
+      data.push_back(var);  // finding the sum of all the data magnitudes
+      sum += var;
    }
    readFile.close();
 
+
    // 3. find noise threshold
-   threshold = sum / count;
-   std::cout << "\n\nmean = " << sum << " / " << count << " = " << threshold << std::endl;
-   threshold += 6;
-   std::cout << "threshold = mean + 6dB = " << threshold << std::endl;
+   threshold = sum / data.size();
+   std::cout << "\n\nmean = " << sum << " / " << data.size() << " = " << threshold << std::endl;
+   threshold += 8 ;
+   std::cout << "threshold = mean + 8dB = " << threshold << std::endl;
 
 
    // 4. find the values above the threshold 
-   for (int kk=0; kk<data.size(); kk++) {
-      if (data[kk] > threshold){
-         // std::cout << "\t" << data[kk] << "\t      " << freq[kk] << std::endl;
-         abv_threshold_mag.push_back(data[kk]);
-         abv_threshold_freq.push_back(freq[kk]);
-         abv_threshold_index.push_back(kk);
+   for (int jj=0; jj<data.size(); jj++) {
+      if (data[jj] > threshold){
+         // std::cout << "\t" << data[jj] << "\t      " << freq[jj] << "\t" << jj << std::endl;
+         abv_threshold_index.push_back(jj);
       }
    }
 
    
-   // 5. determine the peaks in each data point subset
+    // 5. determine the peaks in each data point subset
    //    - each subset is determined as following
    //       - find the frequency difference between the current and the next data point (neighbors)
-   //       - if the frequency difference is less than -122040
-   greatest = abv_threshold_mag[0];
+   //       - if the frequency difference is less than -122040, dif_index > 10
+   float greatest = data[abv_threshold_index[0]];
    int greatest_index = 0, current_data_index;
-   double bandwidth;
-   int start = abv_threshold_index[0], end;
-   float dif_freq, dif_mag;
 
-   std::cout << "\n\tmagnitude\tfrequency\t\tdata index\tfreq dif\tmag dif\n" << std::endl; // checking the peak vectors
-   for (int ll=0; ll<abv_threshold_mag.size()-1; ll++) { 
+   for (int ll=0; ll<abv_threshold_index.size()-1; ll++) { 
       current_data_index = abv_threshold_index[ll];
+      dif_index = abv_threshold_index[ll+1] - abv_threshold_index[ll];
 
-      // dif_freq  = abv_threshold_freq[ll+1]  - abv_threshold_freq[ll];
-      // dif_mag   = abv_threshold_mag[ll+1]   - abv_threshold_mag[ll];
-      dif_index = abv_threshold_index[ll+1] - abv_threshold_index[ll]; 
+      // std::cout << ll << ". dif_index = " << dif_index << "\tcurrent data index = " << current_data_index << "\tmag = " << data[current_data_index] << std::endl;
 
-      // std::cout << ll << "\t" << data[current_data_index] << "   \t" << freq[current_data_index];
-      // std::cout << "\t\t" << current_data_index << "\t\t" << dif_freq << "\t      ";
-      // std::cout << dif_mag  << "\t\tindex difference = " << dif_index;
-      // std::cout << "\t\tderivative value = dif_mag/dif_freq = " << dif_mag/dif_freq << std::endl;
-
-      if (dif_index > 10) {  // if the current data point is more than 10 points away from the next point in the main dataset, then you're at the end of the peak subset
-         peak_mag.push_back(greatest);
-         peak_freq.push_back(freq[greatest_index]);
-         greatest = data[current_data_index+1];
-         std::cout << "peak detected at index " << greatest_index << "\n" << std::endl;
-      }
-      
-      if (abv_threshold_mag[ll] > greatest) { // finding the greatest magnitude in each subset, this kind of works
-         greatest = data[current_data_index];
+      if ((data[current_data_index] > greatest) ) { // finding the greatest magnitude in each subset, this kind of works
+         greatest = data[current_data_index]; //&& ((data[current_data_index] - threshold) > 3
          greatest_index = current_data_index;
       }
 
-      // // check immediate neighbors: 1 point away - if there's a sharp incline and decline at the current point, push that point to the peak vector
-      // if ( ((data[current_data_index] - data[current_data_index-1]) >= 3) && ((data[current_data_index+1] - data[current_data_index]) <= -3) ) {
-      //    std::cout << "\tsharp peak detected at " << current_data_index << " 1 neighboring point" << std::endl;
-      //    // continue;
-      // }
+      if (dif_index > 10) {  // if the current data point is more than 10 points away from the next point in the main dataset, then you're at the end of the peak subset
+         std::cout << "\ndata point " << greatest_index << " pushed to peak list, mag = " << data[greatest_index] << "\n" << std::endl;
+         peak_index.push_back(greatest_index);
+         greatest = data[abv_threshold_index[ll+1]];
+         greatest_index = abv_threshold_index[ll+1];
+      }
+
+      // check immediate neighbors: 1 point away - if there's a sharp incline and decline at the current point, push that point to the peak vector
+      if ( ((data[current_data_index] - data[current_data_index-1]) >= 3) && ((data[current_data_index+1] - data[current_data_index]) <= -3) ) {
+         std::cout << "\tsharp peak detected at " << current_data_index << " 1 neighboring point" << std::endl;
+         // continue;
+      }
 
    }
-   peak_mag.push_back(greatest); // get the last peak value in the vector
-   peak_freq.push_back(freq[greatest_index]);
+   peak_index.push_back(greatest_index);
    std::cout << "\npeak detected at index " << greatest_index << " last one"<< std::endl;
-
-   // std::cout << "size of abv_threshold_index = " << abv_threshold_mag.size() << std::endl; 
    
    // 6. print the result vector
-   std::cout << "\nsize of peak_mag vector = " << peak_mag.size() << std::endl;
+   std::cout << "\nsize of peak_index vector = " << peak_index.size() << std::endl;
    std::cout << "\n\tmagnitude\t      frequency\n" << std::endl;
-   for (int mm=0; mm<peak_mag.size(); mm++) {
-      std::cout << "\t" << peak_mag[mm] << "\t      " << peak_freq[mm] << std::endl;
+   for (int mm=0; mm<peak_index.size(); mm++) {
+      std::cout << "\t" << data[peak_index[mm]] << "\t      " << freq[peak_index[mm]] << std::endl;
    }
+
+   // maybe find the magnitude difference of [immediate] neighboring points, then 
+   // add the previous slopes together and then next slopes
+   // if the sum of the preiouvs/next slops is greater than 3dB, then its probably a notch peak?
 
    // the expected result of step 6 fro psdFourFloat.bin
    // magnitude             frequency
