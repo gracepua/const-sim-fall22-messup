@@ -4,22 +4,22 @@
 // Revision Data: 10.14.2022
 // Company: IS4S Auburn
 
-//include <iostream>
-//include <stdio.h>     
-//include <math.h>       // sin,pow
-//include <ctime>        // srand,rand
-//include <random>
-//include <tuple>
-//include <complex>
-//include <vector>
+#include <iostream>
+#include <stdio.h>     
+#include <math.h>       // sin,pow
+#include <ctime>        // srand,rand
+#include <random>
+#include <tuple>
+#include <complex>
+#include <vector>
 
-//include "matplotlibcpp.h"
+#include "matplotlibcpp.h"
 
 namespace plt = matplotlibcpp;
 
 //------------------------------------------------------------------
 
-float* irrnotchCoefficients(float _f0, float _fs, float _bw, float _Q) { 
+float* irrnotchCoefficients(float _f0, float _fs, float _bw) { 
 
     // https://www.sciencedirect.com/topics/engineering/notch-filters
     // ^^ Infinite Impulse Response Filter Design
@@ -29,7 +29,7 @@ float* irrnotchCoefficients(float _f0, float _fs, float _bw, float _Q) {
     // float _fs : sampling frequency in Hz
     // float _bw : bandwidth of notch frequency reponse in Hz
 
-    float r;            // I've noticed the smaller r value 
+    float r;            // I've noticed the smaller r value, means a much flatter filter reponse outside of the notch (no gain outside of the )
     float theta; 
     float gain;
     float bandwidth;    // in Hz, this is determined by the quality factor above, probably easier 
