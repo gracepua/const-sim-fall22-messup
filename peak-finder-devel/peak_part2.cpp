@@ -1,7 +1,7 @@
 /* 
  * 
  * Author: Grace Palenapa
- * Revision Date: 11.14.2022
+ * Revision Date: 11.15.2022
  * 
  * read PSD.bin data file and find the peaks 
  *
@@ -37,47 +37,50 @@
  * - (11/14) we can set the noise floor so this'll make finding peaks a bit easier
  *    - how to make this work for broad band signals?
  *    - current result when noise floor is given ( in this case, noise floor = -43dB, threshold requirement = -43 + 8 = -35dB)
- 
-reading values from the .bin file...
-
-mean = 0 / 4096 = -43
-threshold = mean + 8dB = -35
-
-data point 411 pushed to peak list, mag = -16.3694
-        (data[411] = -16.3694) - (threshold = -35) = 18.6306
-        bandwidth = freq[441] - freq[378] = -1.9618e+07 - -2.03869e+07 = 768852
-
-data point 455 pushed to peak list, mag = -34.8657
-        (data[455] = -34.8657) - (threshold = -35) = 0.134338
-                doesn't meet threshold requirement
-        bandwidth = freq[455] - freq[455] = -1.94472e+07 - -1.94472e+07 = 0
-
-data point 1967 pushed to peak list, mag = -15.2028
-        (data[1967] = -15.2028) - (threshold = -35) = 19.7972
-        bandwidth = freq[1975] - freq[1961] = -897100 - -1.06796e+06 = 170856
-
-data point 2176 pushed to peak list, mag = -15.0444
-        (data[2176] = -15.0444) - (threshold = -35) = 19.9556
-        bandwidth = freq[2186] - freq[2159] = 1.67794e+06 - 1.34844e+06 = 329508
-
-data point 2459 pushed to peak list, mag = -16.3681
-        (data[2459] = -16.3681) - (threshold = -35) = 18.6319
-        bandwidth = freq[2495] - freq[2419] = 5.44898e+06 - 4.52148e+06 = 927504
-
-data point 2868 pushed to peak list, mag = -15.4431
-        (data[2868] = -15.4431) - (threshold = -35) =  = 19.5569
-        bandwidth = freq[2884] - freq[2849] = 1.01963e+07 - 9.7692e+06 = 427140
-
-size of peak_index vector = 6
-
-        magnitude             frequency
-
-        -16.3694              -1.99842e+07
-        -34.8657              -1.94472e+07
-        -15.2028              -994732
-        -15.0444              1.5559e+06
-        -16.3681              5.00964e+06
-        -15.4431              1.00011e+07
+ *    - the following result is from the previous github commit (the less complicated version ig)
+ *
+ * reading values from the .bin file... 
+ *
+ * mean = 0 / 4096 = -43
+ * threshold = mean + 8dB = -35
+ *
+ * data point 411 pushed to peak list, mag = -16.3694
+ *      (data[411] = -16.3694) - (threshold = -35) = 18.6306
+ *        bandwidth = freq[441] - freq[378] = -1.9618e+07 - -2.03869e+07 = 768852
+ *
+ * data point 455 pushed to peak list, mag = -34.8657
+ *        (data[455] = -34.8657) - (threshold = -35) = 0.134338
+ *                doesn't meet threshold requirement
+ *        bandwidth = freq[455] - freq[455] = -1.94472e+07 - -1.94472e+07 = 0
+ *
+ * data point 1967 pushed to peak list, mag = -15.2028
+ *        (data[1967] = -15.2028) - (threshold = -35) = 19.7972
+ *        bandwidth = freq[1975] - freq[1961] = -897100 - -1.06796e+06 = 170856
+ *
+ * data point 2176 pushed to peak list, mag = -15.0444
+ *        (data[2176] = -15.0444) - (threshold = -35) = 19.9556
+ *        bandwidth = freq[2186] - freq[2159] = 1.67794e+06 - 1.34844e+06 = 329508
+ *
+ * data point 2459 pushed to peak list, mag = -16.3681
+ *        (data[2459] = -16.3681) - (threshold = -35) = 18.6319
+ *        bandwidth = freq[2495] - freq[2419] = 5.44898e+06 - 4.52148e+06 = 927504
+ *
+ * data point 2868 pushed to peak list, mag = -15.4431
+ *        (data[2868] = -15.4431) - (threshold = -35) =  = 19.5569
+ *        bandwidth = freq[2884] - freq[2849] = 1.01963e+07 - 9.7692e+06 = 427140
+ *
+ * size of peak_index vector = 6
+ *
+ *        magnitude             frequency
+ *
+ *        -16.3694              -1.99842e+07
+ *        -34.8657              -1.94472e+07
+ *        -15.2028              -994732
+ *        -15.0444              1.5559e+06
+ *        -16.3681              5.00964e+06
+ *        -15.4431              1.00011e+07
+ * 
+ * - (11/15)
  */
 
 #include <iostream>
@@ -88,7 +91,7 @@ size of peak_index vector = 6
 namespace plt = matplotlibcpp;
 
 int main() {
-   std::fstream readFile("simulation_data/narrowBandNoiseTwo.bin", std::ios::binary);
+   std::fstream readFile("simulation_data/narrowBandNoiseOne.bin", std::ios::binary);
    float var, dif_index, sum = 0, threshold;
    std::vector<float> data; 
    std::vector<double> freq;
@@ -104,7 +107,7 @@ int main() {
 
 
    // 2. read the psd.bin file and store the psd values
-   readFile.open("simulation_data/narrowBandNoiseTwo.bin"); // reading from bin file: successful!
+   readFile.open("simulation_data/narrowBandNoiseOne.bin"); // reading from bin file: successful!
    if(!readFile) {
       std::cout << "(r)Cannot open file!" << std::endl;
       return 1;
@@ -140,7 +143,7 @@ int main() {
    
 
 
-   // 5. determine the peaks in each data point subset  100000
+   // 5. determine the peaks in each data point subset   100000 Hz = 0.1 MHz
    //    - each subset is determined as following        122040
    //       - find the frequency difference between the current and the next data point (neighbors)
    //       - if the frequency difference is more than 122040
@@ -157,33 +160,44 @@ int main() {
       }  
 
       if (ll == abv_threshold_index.size()-1 || dif_index > 10) {  // if the current data point is more than 10 points away from the next point in the main dataset, then you're at the end of the peak subset
-         std::cout << "\ndata point " << greatest_index << " pushed to peak list, mag = " << data[greatest_index] << std::endl;
+         std::cout << "\nchecking data point " << greatest_index << " for peak list, mag = " << data[greatest_index] << std::endl;
          std::cout << "\t(data[" << greatest_index << "] = " << data[greatest_index] << ") - (threshold = " << threshold 
                    << ") = " << data[greatest_index] - threshold << std::endl;
          
          // std::cout << "\tdif_index = " << dif_index << "\tabv_threshold_index[ll+1]] = " << abv_threshold_index[ll+1] << std::endl;
          // std::cout << "\t(ll == abv_threshold_index.size()-1) = " << (ll == abv_threshold_index.size()-1) << std::endl;
+         // std::cout << "\tindex ll = " << ll << "\tcurrent_data_index = " << current_data_index << std::endl;
+         // std::cout << "\t((data[greatest_index] - threshold) < 5) = " << ((data[greatest_index] - threshold) < 5) << std::endl;
 
          if ((data[greatest_index] - threshold) < 5) {
-            if (ll == abv_threshold_index.size()-1) continue;
+            if (ll == abv_threshold_index.size()-1) continue; 
 
             greatest = data[abv_threshold_index[ll+1]];
             greatest_index = abv_threshold_index[ll+1];
             continue; // this'll pass the following commands and then go back to the beginning of the for loop
          }
-         
-
-         std::cout << "\tindex ll = " << ll << "\tcurrent_data_index = " << current_data_index << std::endl;
-         
-         peak_index.push_back(greatest_index);
-         greatest = data[abv_threshold_index[ll+1]];
-         greatest_index = abv_threshold_index[ll+1];
 
          end_index = current_data_index;
          bandwidth = freq[end_index] - freq[start_index];
          std::cout << "\tbandwidth = freq[" << end_index<< "] - freq[" << start_index << "] = " << freq[end_index] 
                    << " - " << freq[start_index] <<  " = " << bandwidth << std::endl;
          start_index = abv_threshold_index[ll+1];
+
+         // if (bandwidth > 200000) { // this needs to be slightly editted bc the notches are good but the bandwidth is throwing the program off
+         //    if (ll == abv_threshold_index.size()-1) continue;
+
+         //    greatest = data[abv_threshold_index[ll+1]];
+         //    greatest_index = abv_threshold_index[ll+1];
+         //    continue; //  
+         // }
+
+
+         peak_index.push_back(greatest_index);
+         std::cout << "\t\tdone pushing the index to the vector" << std::endl;
+
+         if (ll == abv_threshold_index.size()-1) continue; // if the end of the abv_threshold_index vector, exit the for loop
+         greatest = data[abv_threshold_index[ll+1]];
+         greatest_index = abv_threshold_index[ll+1];
       }
    }
 
@@ -321,59 +335,3 @@ int main() {
 
       
 //    } 
-
-
-// std::cout << ll << ". dif_index = " << dif_index << "\t mag = " << data[current_data_index] << std::endl;
-
-      // if ((data[current_data_index] > greatest) && ((data[current_data_index] - threshold) > 3)) { // finding the greatest magnitude in each subset, this kind of works
-      //    greatest = data[current_data_index];
-      //    greatest_index = current_data_index;
-      // }
-
-      // if (dif_index > 10) {  // if the current data point is more than 10 points away from the next point in the main dataset, then you're at the end of the peak subset
-
-      //    // slight error here there on psdThreeFloat.bin
-      //    // should I check if the same point is already in the vector?
-
-      //    // if (freq[greatest_index] == peak_freq.back()) std::cout << "the same freq/mag" << std::endl;
-
-      //    if ((greatest - threshold) < 3) { // if this is point is just way too low then don't even bother
-      //       std::cout << "greatest - threshold = " << greatest << " - " 
-      //                 << threshold << " = " << greatest - threshold << std::endl;
-      //       continue;
-      //    }
-
-      //    std::cout << "peak detected at index " << greatest_index << std::endl;
-      //    std::cout << "\tgreatest - threshold = " << greatest << " - " 
-      //              << threshold << " = " << greatest - threshold << std::endl;
-      //    std::cout << "\t(greatest - threshold) > 3 = " << ((greatest - threshold) > 3) << std::endl;
-      //    if (peak_index.empty() == 1 && (greatest - threshold) > 3) {
-      //       std::cout << "\tfirst element: point " << greatest_index << std::endl;
-      //       peak_index.push_back(greatest_index);
-      //       greatest = data[current_data_index+1];
-      //       greatest_index = abv_threshold_index[ll+1];
-      //       continue;
-      //    }   
-         
-      //    if (greatest_index == peak_index.back()) {
-      //       std::cout << "\tthe same freq/mag" << std::endl;
-      //       greatest = data[abv_threshold_index[ll+1]];
-      //       greatest_index = abv_threshold_index[ll+1];
-      //       continue;
-      //    }
-
-         // peak_index.push_back(greatest_index);
-         // greatest = data[current_data_index+1];
-         // greatest_index = abv_threshold_index[ll+1];
-
-         // std::cout << "end of if statement" << std::endl;
-      // }
-   
-
-      // // check immediate neighbors: 1 point away - if there's a sharp incline and decline at the current point, push that point to the peak vector
-      // if ( ((data[current_data_index] - data[current_data_index-1]) >= 3) && ((data[current_data_index+1] - data[current_data_index]) <= -3) ) {
-      //    std::cout << "\tsharp peak detected at " << current_data_index << " 1 neighboring point" << std::endl;
-      //    // continue;
-      // }
-
-      // std::cout << "end of for loop" << std::endl;
