@@ -48,7 +48,7 @@ float* irrnotchCoefficients(float _f0, float _fs, float _bw) {
     coefficients[4] = -2.0*r*cos(theta);           
     coefficients[5] = pow(r,2);
 
-    coefficients[6] = gain;    // just to see what the gain is
+    coefficients[6] = gain;    // just to see what the gain is, this doesn't really determine how deep the notch is?
     coefficients[7] = r;
 
     return coefficients;            

@@ -80,7 +80,7 @@
  *        -16.3681              5.00964e+06
  *        -15.4431              1.00011e+07
  * 
- * - (11/15)
+ * - (11/15) need a better way to determine peaks?
  */
 
 #include <iostream>
@@ -91,7 +91,7 @@
 namespace plt = matplotlibcpp;
 
 int main() {
-   std::fstream readFile("simulation_data/narrowBandNoiseOne.bin", std::ios::binary);
+   std::fstream readFile("simulation_data/narrowBandNoiseOne.bin", std::ios::binary); //narrowBandNoiseOne
    float var, dif_index, sum = 0, threshold;
    std::vector<float> data; 
    std::vector<double> freq;
@@ -149,6 +149,7 @@ int main() {
    //       - if the frequency difference is more than 122040
    float greatest = data[abv_threshold_index[0]], bandwidth = 0;
    int greatest_index = 0, current_data_index, start_index = abv_threshold_index[0], end_index;
+   float slopeb1, slopeb2, slopeb3, slopeb4, slopeb5, slopea1, slopea2, slopea3, slopea4, slopea5;
 
    for (int ll=0; ll<abv_threshold_index.size(); ll++) { 
       current_data_index = abv_threshold_index[ll];
@@ -157,7 +158,17 @@ int main() {
       if (data[current_data_index] > greatest) { // finding the greatest magnitude in each subset, this kind of works
          greatest = data[current_data_index]; 
          greatest_index = current_data_index;
-      }  
+      }
+
+      // flag a possible peak
+      if ( ((data[current_data_index] - data[current_data_index-1]) >= 5) && ((data[current_data_index+1] - data[current_data_index]) <= -5) ) {
+         std::cout << "\nsharp peak detected at " << current_data_index << " 1 neighboring point" << std::endl;
+         // if (slopeb1 > 0 && slopeb2 > 0 && slopeb3 > 0 && slopeb4 > 0 && slopeb5 > 0 && slopea1 < 0 && slopea2 < 0 && slopea3 < 0 && slopea4 < 0 && slopea5 < 0) {
+         //    std::cout << "\tthis could definitely be a peak" << std::endl;
+         //    possible_peak.push_back(current_data_index);
+         // }
+         // else std::cout << "not a peak" << std::endl;
+      }
 
       if (ll == abv_threshold_index.size()-1 || dif_index > 10) {  // if the current data point is more than 10 points away from the next point in the main dataset, then you're at the end of the peak subset
          std::cout << "\nchecking data point " << greatest_index << " for peak list, mag = " << data[greatest_index] << std::endl;
@@ -191,6 +202,29 @@ int main() {
          //    continue; //  
          // }
 
+         // verify peak in this section
+         slopeb1 = data[greatest_index]   - data[greatest_index-1];
+         slopeb2 = data[greatest_index-1] - data[greatest_index-2];
+         slopeb3 = data[greatest_index-2] - data[greatest_index-3];
+         slopeb4 = data[greatest_index-3] - data[greatest_index-4];
+         slopeb5 = data[greatest_index-4] - data[greatest_index-5];
+
+         slopea1 = data[greatest_index+1] - data[greatest_index];
+         slopea2 = data[greatest_index+2] - data[greatest_index+1];
+         slopea3 = data[greatest_index+3] - data[greatest_index+2];
+         slopea4 = data[greatest_index+4] - data[greatest_index+3];
+         slopea5 = data[greatest_index+5] - data[greatest_index+4];
+
+         std::cout << "\tslopeb5 < 0 => " << (slopeb5 > 0) << std::endl;
+         std::cout << "\tslopeb4 < 0 => " << (slopeb4 > 0) << std::endl;
+         std::cout << "\tslopeb3 < 0 => " << (slopeb3 > 0) << std::endl;
+         std::cout << "\tslopeb2 < 0 => " << (slopeb2 > 0) << std::endl;
+         std::cout << "\tslopeb1 < 0 => " << (slopeb1 > 0) << std::endl;
+         std::cout << "\tslopea1 > 0 => " << (slopea1 < 0) << std::endl;
+         std::cout << "\tslopea2 > 0 => " << (slopea2 < 0) << std::endl;
+         std::cout << "\tslopea3 > 0 => " << (slopea3 < 0) << std::endl;
+         std::cout << "\tslopea4 > 0 => " << (slopea4 < 0) << std::endl;
+         std::cout << "\tslopea5 > 0 => " << (slopea5 < 0) << std::endl;
 
          peak_index.push_back(greatest_index);
          std::cout << "\t\tdone pushing the index to the vector" << std::endl;
@@ -283,29 +317,29 @@ int main() {
 //          // greatest_index = 
          
 
-//          // // verify peak in this section
-//          slopeb1 = data[greatest_index]   - data[greatest_index-1];
-//          slopeb2 = data[greatest_index-1] - data[greatest_index-2];
-//          slopeb3 = data[greatest_index-2] - data[greatest_index-3];
-//          slopeb4 = data[greatest_index-3] - data[greatest_index-4];
-//          slopeb5 = data[greatest_index-4] - data[greatest_index-5];
+         // // verify peak in this section
+         // slopeb1 = data[greatest_index]   - data[greatest_index-1];
+         // slopeb2 = data[greatest_index-1] - data[greatest_index-2];
+         // slopeb3 = data[greatest_index-2] - data[greatest_index-3];
+         // slopeb4 = data[greatest_index-3] - data[greatest_index-4];
+         // slopeb5 = data[greatest_index-4] - data[greatest_index-5];
 
-//          slopea1 = data[greatest_index+1] - data[greatest_index];
-//          slopea2 = data[greatest_index+2] - data[greatest_index+1];
-//          slopea3 = data[greatest_index+3] - data[greatest_index+2];
-//          slopea4 = data[greatest_index+4] - data[greatest_index+3];
-//          slopea5 = data[greatest_index+5] - data[greatest_index+4];
+         // slopea1 = data[greatest_index+1] - data[greatest_index];
+         // slopea2 = data[greatest_index+2] - data[greatest_index+1];
+         // slopea3 = data[greatest_index+3] - data[greatest_index+2];
+         // slopea4 = data[greatest_index+4] - data[greatest_index+3];
+         // slopea5 = data[greatest_index+5] - data[greatest_index+4];
 
-//          std::cout << "\tslopeb5 < 0 => " << (slopeb5 > 0) << std::endl;
-//          std::cout << "\tslopeb4 < 0 => " << (slopeb4 > 0) << std::endl;
-//          std::cout << "\tslopeb3 < 0 => " << (slopeb3 > 0) << std::endl;
-//          std::cout << "\tslopeb2 < 0 => " << (slopeb2 > 0) << std::endl;
-//          std::cout << "\tslopeb1 < 0 => " << (slopeb1 > 0) << std::endl;
-//          std::cout << "\tslopea1 > 0 => " << (slopea1 < 0) << std::endl;
-//          std::cout << "\tslopea2 > 0 => " << (slopea2 < 0) << std::endl;
-//          std::cout << "\tslopea3 > 0 => " << (slopea3 < 0) << std::endl;
-//          std::cout << "\tslopea4 > 0 => " << (slopea4 < 0) << std::endl;
-//          std::cout << "\tslopea5 > 0 => " << (slopea5 < 0) << std::endl;
+         // std::cout << "\tslopeb5 < 0 => " << (slopeb5 > 0) << std::endl;
+         // std::cout << "\tslopeb4 < 0 => " << (slopeb4 > 0) << std::endl;
+         // std::cout << "\tslopeb3 < 0 => " << (slopeb3 > 0) << std::endl;
+         // std::cout << "\tslopeb2 < 0 => " << (slopeb2 > 0) << std::endl;
+         // std::cout << "\tslopeb1 < 0 => " << (slopeb1 > 0) << std::endl;
+         // std::cout << "\tslopea1 > 0 => " << (slopea1 < 0) << std::endl;
+         // std::cout << "\tslopea2 > 0 => " << (slopea2 < 0) << std::endl;
+         // std::cout << "\tslopea3 > 0 => " << (slopea3 < 0) << std::endl;
+         // std::cout << "\tslopea4 > 0 => " << (slopea4 < 0) << std::endl;
+         // std::cout << "\tslopea5 > 0 => " << (slopea5 < 0) << std::endl;
 
 //          // if (slopeb1 > 0 && slopeb2 > 0 && slopeb3 > 0 && slopeb4 > 0 && slopeb5 > 0 && slopea1 < 0 && slopea2 < 0 && slopea3 < 0 && slopea4 < 0 && slopea5 < 0) {
 //          //    std::cout << "peak detected at index " << greatest_index << "\n" << std::endl;
@@ -322,15 +356,15 @@ int main() {
 //          greatest = data[current_data_index];
 //          greatest_index = current_data_index;
 
-//          // flag a possible peak
-//          if ( ((data[current_data_index] - data[current_data_index-1]) >= 5) && ((data[current_data_index+1] - data[current_data_index]) <= -5) ) {
-//             std::cout << "\tsharp peak detected at " << current_data_index << " 1 neighboring point => " << std::endl;
-//             // if (slopeb1 > 0 && slopeb2 > 0 && slopeb3 > 0 && slopeb4 > 0 && slopeb5 > 0 && slopea1 < 0 && slopea2 < 0 && slopea3 < 0 && slopea4 < 0 && slopea5 < 0) {
-//             //    std::cout << "\tthis could definitely be a peak" << std::endl;
-//             //    possible_peak.push_back(current_data_index);
-//             // }
-//             // else std::cout << "not a peak" << std::endl;
-//          }
+         // // flag a possible peak
+         // if ( ((data[current_data_index] - data[current_data_index-1]) >= 5) && ((data[current_data_index+1] - data[current_data_index]) <= -5) ) {
+         //    std::cout << "\tsharp peak detected at " << current_data_index << " 1 neighboring point => " << std::endl;
+         //    // if (slopeb1 > 0 && slopeb2 > 0 && slopeb3 > 0 && slopeb4 > 0 && slopeb5 > 0 && slopea1 < 0 && slopea2 < 0 && slopea3 < 0 && slopea4 < 0 && slopea5 < 0) {
+         //    //    std::cout << "\tthis could definitely be a peak" << std::endl;
+         //    //    possible_peak.push_back(current_data_index);
+         //    // }
+         //    // else std::cout << "not a peak" << std::endl;
+         // }
 //       } 
 
       
