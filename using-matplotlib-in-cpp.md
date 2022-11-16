@@ -35,7 +35,7 @@ This is what worked for me because what was on the [matplotlib repo](https://git
      source <path-to-environment-directory>/bin/activate     // activate the environment 
      pip3 install matplotlib                                 // installing  libraries
      sudo apt-get install python-numpy libpython3.8-dev
-     ls /usr/local/include/python3.8                         // to check if the python3-dev library was installed, there should be lots of header files here
+     ls /usr/include/python3.8                               // to check if the python3-dev library was installed, there should be lots of header files here
      ```
      - You can also use `python3.8-dev` besides `libpython3.8-dev`. I think it's the same thing.
 
