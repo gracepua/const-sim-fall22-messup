@@ -1,4 +1,4 @@
-#!/mnt/c/my_vivado_projects/CONSTELLATION_SIM/htg-devel/coding_constellation_sim/.venv-wsl/bin/python3
+#!/mnt/c/my_vivado_projects/constellation-sim-fall22/.venv-wsl/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys

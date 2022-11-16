@@ -8,7 +8,7 @@ alias deactivate 'test $?_OLD_VIRTUAL_PATH != 0 && setenv PATH "$_OLD_VIRTUAL_PA
 # Unset irrelevant variables.
 deactivate nondestructive
 
-setenv VIRTUAL_ENV "/mnt/c/my_vivado_projects/CONSTELLATION_SIM/htg-devel/coding_constellation_sim/.venv-wsl"
+setenv VIRTUAL_ENV "/mnt/c/my_vivado_projects/constellation-sim-fall22/.venv-wsl"
 
 set _OLD_VIRTUAL_PATH="$PATH"
 setenv PATH "$VIRTUAL_ENV/bin:$PATH"

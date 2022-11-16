@@ -29,7 +29,7 @@ end
 # unset irrelevant variables
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/mnt/c/my_vivado_projects/CONSTELLATION_SIM/htg-devel/coding_constellation_sim/.venv-wsl"
+set -gx VIRTUAL_ENV "/mnt/c/my_vivado_projects/constellation-sim-fall22/.venv-wsl"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH
