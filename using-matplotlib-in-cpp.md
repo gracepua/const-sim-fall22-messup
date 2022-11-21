@@ -34,7 +34,8 @@ This is what worked for me because what was on the [matplotlib repo](https://git
      python3 -m venv <name-of-your-environment>              // create an environment for your project
      source <path-to-environment-directory>/bin/activate     // activate the environment 
      pip3 install matplotlib                                 // installing  libraries
-     sudo apt-get install python-numpy libpython3.8-dev
+     sudo apt-get install python-numpy libpython3.8-dev python3-tk
+          // python3-tk is use to resolve "sys:1: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure." error
      ls /usr/include/python3.8                               // to check if the python3-dev library was installed, there should be lots of header files here
      ```
      - You can also use `python3.8-dev` besides `libpython3.8-dev`. I think it's the same thing.

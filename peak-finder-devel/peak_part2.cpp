@@ -81,6 +81,11 @@
  *        -15.4431              1.00011e+07
  * 
  * - (11/15) need a better way to determine peaks?
+ * - (11/17) okay i'm gonna say that bandwidth is determined by the where the slope changes direction
+ *    - left side of the peak - positive slopes
+ *    - right side of the peaks - negative slopes
+ *    - gonna try this method bc the bandwisth determined by the beginning and end of the data is kind of big?
+ *    - just printing stuff out to test
  */
 
 #include <iostream>
@@ -114,11 +119,9 @@ int main() {
    }
    std::cout << "\nreading values from the .bin file..." << std::endl;
    
-   int count = 0, n = 0;
    while (true) { // note: don't use .eof() function. use this loop format
       readFile.read((char*)&var, 4);
       if( readFile.eof() ) break;
-
       data.push_back(var);  // finding the sum of all the data magnitudes
       // sum += var;
    }
@@ -150,6 +153,7 @@ int main() {
    float greatest = data[abv_threshold_index[0]], bandwidth = 0;
    int greatest_index = 0, current_data_index, start_index = abv_threshold_index[0], end_index;
    float slopeb1, slopeb2, slopeb3, slopeb4, slopeb5, slopea1, slopea2, slopea3, slopea4, slopea5;
+   float left_slope = 0, right_slope = 0, temp, temp_left, temp_right;
 
    for (int ll=0; ll<abv_threshold_index.size(); ll++) { 
       current_data_index = abv_threshold_index[ll];
@@ -194,13 +198,35 @@ int main() {
                    << " - " << freq[start_index] <<  " = " << bandwidth << std::endl;
          start_index = abv_threshold_index[ll+1];
 
-         // if (bandwidth > 200000) { // this needs to be slightly editted bc the notches are good but the bandwidth is throwing the program off
-         //    if (ll == abv_threshold_index.size()-1) continue;
-
+         if (bandwidth > 1000000) { // this needs to be slightly editted bc the notches are good but the bandwidth is throwing the program off
+            if (ll == abv_threshold_index.size()-1) continue;
+               std::cout << "\tdoes not meet bandwidth requirements" << std::endl;
          //    greatest = data[abv_threshold_index[ll+1]];
          //    greatest_index = abv_threshold_index[ll+1];
          //    continue; //  
-         // }
+         }
+
+         // checking bandwidth a different way 
+         // another for loop?
+         temp_right = greatest_index;
+         temp_left = greatest_index;
+         std::cout << std::endl;
+         for (int nn=0; nn<6; nn++) {
+            temp = data[temp_left] - data[temp_left-1];
+            std::cout << "\t\tdata[" << temp_left << "] - data[" << temp_left-1 << "] = " << temp << std::endl;
+            if (temp > 0) left_slope += temp;
+            
+            temp = data[temp_right+1] - data[temp_right];
+            std::cout << "\t\tdata[" << temp_right+1 << "] - data[" << temp_right << "] = " << temp << std::endl;
+            if (temp < 0) right_slope += temp;
+
+            temp_left--;
+            temp_right++; 
+         }
+         std::cout << "\n\tleft_slope = " << left_slope << std::endl;
+         std::cout << "\tright_slope = " << right_slope << "\n" << std::endl;
+         left_slope = 0;
+         right_slope = 0;
 
          // verify peak in this section
          slopeb1 = data[greatest_index]   - data[greatest_index-1];
