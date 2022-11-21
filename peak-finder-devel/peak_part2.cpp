@@ -91,12 +91,13 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <cmath>
 #include "matplotlibcpp.h"
 
 namespace plt = matplotlibcpp;
 
 int main() {
-   std::fstream readFile("simulation_data/narrowBandNoiseOne.bin", std::ios::binary); //narrowBandNoiseOne
+   std::fstream readFile("simulation_data/psdThreeFloat.bin", std::ios::binary); //narrowBandNoiseOne
    float var, dif_index, sum = 0, threshold;
    std::vector<float> data; 
    std::vector<double> freq;
@@ -112,7 +113,7 @@ int main() {
 
 
    // 2. read the psd.bin file and store the psd values
-   readFile.open("simulation_data/narrowBandNoiseOne.bin"); // reading from bin file: successful!
+   readFile.open("simulation_data/psdThreeFloat.bin"); // reading from bin file: successful!
    if(!readFile) {
       std::cout << "(r)Cannot open file!" << std::endl;
       return 1;
@@ -206,54 +207,83 @@ int main() {
          //    continue; //  
          }
 
-         // checking bandwidth a different way 
-         // another for loop?
-         temp_right = greatest_index;
-         temp_left = greatest_index;
-         std::cout << std::endl;
-         for (int nn=0; nn<6; nn++) {
-            temp = data[temp_left] - data[temp_left-1];
-            std::cout << "\t\tdata[" << temp_left << "] - data[" << temp_left-1 << "] = " << temp << std::endl;
-            if (temp > 0) left_slope += temp;
+         // // checking bandwidth a different way 
+         // // another for loop?
+         // temp_right = greatest_index;
+         // temp_left = greatest_index;
+         // std::cout << std::endl;
+         // for (int nn=0; nn<6; nn++) {
+         //    temp = data[temp_left] - data[temp_left-1];
+         //    std::cout << "\t\tdata[" << temp_left << "] - data[" << temp_left-1 << "] = " << temp << std::endl;
+         //    if (temp > 0) left_slope += temp;
             
-            temp = data[temp_right+1] - data[temp_right];
-            std::cout << "\t\tdata[" << temp_right+1 << "] - data[" << temp_right << "] = " << temp << std::endl;
-            if (temp < 0) right_slope += temp;
+         //    temp = data[temp_right+1] - data[temp_right];
+         //    std::cout << "\t\tdata[" << temp_right+1 << "] - data[" << temp_right << "] = " << temp << std::endl;
+         //    if (temp < 0) right_slope += temp;
 
-            temp_left--;
-            temp_right++; 
+         //    temp_left--;
+         //    temp_right++; 
+         // }
+         // std::cout << "\n\tleft_slope = " << left_slope << std::endl;
+         // std::cout << "\tright_slope = " << right_slope << "\n" << std::endl;
+         // left_slope = 0;
+         // right_slope = 0;
+
+         // // verify peak in this section
+         // slopeb1 = data[greatest_index]   - data[greatest_index-1];
+         // slopeb2 = data[greatest_index-1] - data[greatest_index-2];
+         // slopeb3 = data[greatest_index-2] - data[greatest_index-3];
+         // slopeb4 = data[greatest_index-3] - data[greatest_index-4];
+         // slopeb5 = data[greatest_index-4] - data[greatest_index-5];
+
+         // slopea1 = data[greatest_index+1] - data[greatest_index];
+         // slopea2 = data[greatest_index+2] - data[greatest_index+1];
+         // slopea3 = data[greatest_index+3] - data[greatest_index+2];
+         // slopea4 = data[greatest_index+4] - data[greatest_index+3];
+         // slopea5 = data[greatest_index+5] - data[greatest_index+4];
+
+         // std::cout << "\tslopeb5 < 0 => " << (slopeb5 > 0) << std::endl;
+         // std::cout << "\tslopeb4 < 0 => " << (slopeb4 > 0) << std::endl;
+         // std::cout << "\tslopeb3 < 0 => " << (slopeb3 > 0) << std::endl;
+         // std::cout << "\tslopeb2 < 0 => " << (slopeb2 > 0) << std::endl;
+         // std::cout << "\tslopeb1 < 0 => " << (slopeb1 > 0) << std::endl;
+         // std::cout << "\tslopea1 > 0 => " << (slopea1 < 0) << std::endl;
+         // std::cout << "\tslopea2 > 0 => " << (slopea2 < 0) << std::endl;
+         // std::cout << "\tslopea3 > 0 => " << (slopea3 < 0) << std::endl;
+         // std::cout << "\tslopea4 > 0 => " << (slopea4 < 0) << std::endl;
+         // std::cout << "\tslopea5 > 0 => " << (slopea5 < 0) << std::endl;
+
+         // another peak checking method: make sure the data from the 
+         //    peak is consistently going downward
+         // if the magnitude of the next slope is less than the previous one, 
+         //    flag it for now
+         //    - when do i need to flag it?
+         float previous_slope_left = data[greatest_index] - data[greatest_index-1]; // should be positive
+         float previous_slope_right = data[greatest_index+1] - data[greatest_index]; // should be negative
+         std::cout << "\t\tleft_slope  1 point  from detected peak center = " << previous_slope_left << std::endl;
+         std::cout << "\t\tright_slope 1 point  from detected peak center = " << previous_slope_right << std::endl;
+
+         for (int oo=2; oo<6; oo++) {
+            temp = data[greatest_index] - data[greatest_index-oo];
+            std::cout << "\t\tleft_slope  " << oo << " points from detected peak center = " << temp << " --> ";
+            if (abs(temp) > abs(previous_slope_right)) {
+               std::cout << "\tmag greater than previous ( = " << previous_slope_left << ")" << std::endl;
+               previous_slope_left = temp;
+            }
+            else std::cout << "\tmag less than previous ( = " << previous_slope_left << ")" << std::endl;
+
+            temp = data[greatest_index+oo] - data[greatest_index];
+            std::cout << "\t\tright_slope " << oo << " points from detected peak center = " << temp << " --> ";
+            if (abs(temp) > abs(previous_slope_right)) {
+               std::cout << "\tmag greater than previous ( = " << previous_slope_right << ")" << std::endl;
+               previous_slope_right = temp;
+            }
+            else std::cout << "\tmag less than previous ( = " << previous_slope_right << ")" << std::endl;
          }
-         std::cout << "\n\tleft_slope = " << left_slope << std::endl;
-         std::cout << "\tright_slope = " << right_slope << "\n" << std::endl;
-         left_slope = 0;
-         right_slope = 0;
-
-         // verify peak in this section
-         slopeb1 = data[greatest_index]   - data[greatest_index-1];
-         slopeb2 = data[greatest_index-1] - data[greatest_index-2];
-         slopeb3 = data[greatest_index-2] - data[greatest_index-3];
-         slopeb4 = data[greatest_index-3] - data[greatest_index-4];
-         slopeb5 = data[greatest_index-4] - data[greatest_index-5];
-
-         slopea1 = data[greatest_index+1] - data[greatest_index];
-         slopea2 = data[greatest_index+2] - data[greatest_index+1];
-         slopea3 = data[greatest_index+3] - data[greatest_index+2];
-         slopea4 = data[greatest_index+4] - data[greatest_index+3];
-         slopea5 = data[greatest_index+5] - data[greatest_index+4];
-
-         std::cout << "\tslopeb5 < 0 => " << (slopeb5 > 0) << std::endl;
-         std::cout << "\tslopeb4 < 0 => " << (slopeb4 > 0) << std::endl;
-         std::cout << "\tslopeb3 < 0 => " << (slopeb3 > 0) << std::endl;
-         std::cout << "\tslopeb2 < 0 => " << (slopeb2 > 0) << std::endl;
-         std::cout << "\tslopeb1 < 0 => " << (slopeb1 > 0) << std::endl;
-         std::cout << "\tslopea1 > 0 => " << (slopea1 < 0) << std::endl;
-         std::cout << "\tslopea2 > 0 => " << (slopea2 < 0) << std::endl;
-         std::cout << "\tslopea3 > 0 => " << (slopea3 < 0) << std::endl;
-         std::cout << "\tslopea4 > 0 => " << (slopea4 < 0) << std::endl;
-         std::cout << "\tslopea5 > 0 => " << (slopea5 < 0) << std::endl;
+         std::cout << std::endl;
 
          peak_index.push_back(greatest_index);
-         std::cout << "\t\tdone pushing the index to the vector" << std::endl;
+         std::cout << "\tdone pushing the index to the vector" << std::endl;
 
          if (ll == abv_threshold_index.size()-1) continue; // if the end of the abv_threshold_index vector, exit the for loop
          greatest = data[abv_threshold_index[ll+1]];
